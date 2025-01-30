@@ -23,6 +23,9 @@ public class Dresseur {
 	@ElementCollection
 	private List<LocalDate> historiqueTirages = new ArrayList<>();
 
+	@ElementCollection
+	private List<LocalDate> historiqueEchanges = new ArrayList<>();
+
 	@ManyToMany
 	private List<Pokemon> pokemonList = new ArrayList<>();
 
@@ -73,4 +76,10 @@ public class Dresseur {
 	public void setHistoriqueTirages(List<LocalDate> historiqueTirages) {
 		this.historiqueTirages = historiqueTirages;
 	}
+
+	public List<LocalDate> getHistoriqueEchanges() {
+		return historiqueEchanges;
+	}
+
+	public void setHistoriqueEchanges(List<LocalDate> historiqueEchanges) {}
 }

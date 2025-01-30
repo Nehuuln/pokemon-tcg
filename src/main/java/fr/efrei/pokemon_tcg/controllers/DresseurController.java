@@ -2,6 +2,7 @@ package fr.efrei.pokemon_tcg.controllers;
 
 import fr.efrei.pokemon_tcg.dto.CapturePokemon;
 import fr.efrei.pokemon_tcg.dto.DresseurDTO;
+import fr.efrei.pokemon_tcg.dto.EchangePokemon;
 import fr.efrei.pokemon_tcg.models.Dresseur;
 import fr.efrei.pokemon_tcg.models.Pokemon;
 import fr.efrei.pokemon_tcg.services.IDresseurService;
@@ -64,5 +65,18 @@ public class DresseurController {
 			System.out.println("Erreur dans le tirage: " + e.getMessage());
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	@PatchMapping("/{uuid}/echanger")
+	public ResponseEntity<String> echangerPokemon(
+			@PathVariable String uuid,
+			@RequestBody EchangePokemon.EchangeRequest request) {
+
+		boolean success = dresseurService.echangerPokemon(uuid, request);
+
+		if (success) {
+			return ResponseEntity.ok("Échange effectué avec succès !");
+		}
+		return ResponseEntity.badRequest().body("Échec de l'échange.");
 	}
 }

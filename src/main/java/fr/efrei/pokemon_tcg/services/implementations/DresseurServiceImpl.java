@@ -2,6 +2,7 @@ package fr.efrei.pokemon_tcg.services.implementations;
 
 import fr.efrei.pokemon_tcg.dto.CapturePokemon;
 import fr.efrei.pokemon_tcg.dto.DresseurDTO;
+import fr.efrei.pokemon_tcg.dto.EchangePokemon;
 import fr.efrei.pokemon_tcg.models.Dresseur;
 import fr.efrei.pokemon_tcg.models.Pokemon;
 import fr.efrei.pokemon_tcg.repositories.DresseurRepository;
@@ -97,6 +98,39 @@ public class DresseurServiceImpl implements IDresseurService {
 		dresseur.getPokemonList().addAll(tirage);
 		dresseur.getHistoriqueTirages().add(today);
 		repository.save(dresseur);
+
+		return true;
+	}
+
+	@Override
+	public boolean echangerPokemon(String uuid, EchangePokemon.EchangeRequest request) {
+		Dresseur dresseur1 = findById(uuid);
+		Dresseur dresseur2 = findById(request.getUuidDresseur2());
+
+		if (dresseur1 == null || dresseur2 == null) {
+			throw new RuntimeException("L'un des dresseurs est introuvable");
+		}
+
+		LocalDate today = LocalDate.now();
+		if (dresseur1.getHistoriqueEchanges().contains(today) || dresseur2.getHistoriqueEchanges().contains(today)) {
+			throw new RuntimeException("Un des dresseurs a déjà échangé aujourd'hui");
+		}
+
+		Pokemon pokemon1 = pokemonService.findById(request.getUuidPokemon1());
+		Pokemon pokemon2 = pokemonService.findById(request.getUuidPokemon2());
+
+		if (!dresseur1.getPokemonList().contains(pokemon1) || !dresseur2.getPokemonList().contains(pokemon2)) {
+			throw new RuntimeException("Un des dresseurs ne possède pas le Pokémon à échanger");
+		}
+
+		dresseur1.getPokemonList().remove(pokemon1);
+		dresseur2.getPokemonList().remove(pokemon2);
+		dresseur1.getPokemonList().add(pokemon2);
+		dresseur2.getPokemonList().add(pokemon1);
+		dresseur1.getHistoriqueEchanges().add(today);
+		dresseur2.getHistoriqueEchanges().add(today);
+		repository.save(dresseur1);
+		repository.save(dresseur2);
 
 		return true;
 	}

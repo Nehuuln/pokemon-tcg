@@ -2,6 +2,7 @@ package fr.efrei.pokemon_tcg.services;
 
 import fr.efrei.pokemon_tcg.dto.CapturePokemon;
 import fr.efrei.pokemon_tcg.dto.DresseurDTO;
+import fr.efrei.pokemon_tcg.dto.EchangePokemon;
 import fr.efrei.pokemon_tcg.models.Dresseur;
 import fr.efrei.pokemon_tcg.models.Pokemon;
 
@@ -19,4 +20,6 @@ public interface IDresseurService {
 	void capturerPokemon(String uuid, CapturePokemon capturePokemon);
 
 	boolean tirerPokemon(String uuid);
+
+	boolean echangerPokemon(String uuid, EchangePokemon.EchangeRequest request);
 }
