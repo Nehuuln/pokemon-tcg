@@ -12,6 +12,12 @@ public class Pokemon {
 
 	private String nom;
 
+	private int puissance;
+
+	private String attaque1;
+
+	private String attaque2;
+
 	private Integer etoile;
 
 	@Enumerated(EnumType.STRING)
@@ -43,5 +49,33 @@ public class Pokemon {
 
 	public String getUuid() {
 		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public int getPuissance() {
+		return puissance;
+	}
+
+	public String getAttaque1() {
+		return attaque1;
+	}
+
+	public String getAttaque2() {
+		return attaque2;
+	}
+
+	public void setPuissance(int puissance) {
+		this.puissance = puissance;
+	}
+
+	public void setAttaque1(String attaque1) {
+		this.attaque1 = attaque1;
+	}
+
+	public void setAttaque2(String attaque2) {
+		this.attaque2 = attaque2;
 	}
 }

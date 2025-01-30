@@ -41,7 +41,7 @@ public class DresseurServiceImpl implements IDresseurService {
 	public void capturerPokemon(String uuid, CapturePokemon capturePokemon) {
 		Dresseur dresseur = findById(uuid);
 		Pokemon pokemon = pokemonService.findById(capturePokemon.getUuid());
-		dresseur.getPokemonList().add(pokemon);
+		dresseur.getPaquetSecondaire().add(pokemon);
 		repository.save(dresseur);
 	}
 
@@ -76,26 +76,33 @@ public class DresseurServiceImpl implements IDresseurService {
 
 		LocalDate today = LocalDate.now();
 		if (dresseur.getHistoriqueTirages().contains(today)) {
-			throw new RuntimeException("Le dresseur a déjà tiré aujourd'hui !");
+			throw new RuntimeException("Le dresseur a déjà tiré des Pokémon aujourd'hui !");
 		}
 
 		List<Pokemon> tousLesPokemons = pokemonService.findAll(null);
-		List<Pokemon> pokemonsPossedes = dresseur.getPokemonList();
+		List<Pokemon> pokemonsPossedes = new ArrayList<>();
+		pokemonsPossedes.addAll(dresseur.getPaquetPrincipal());
+		pokemonsPossedes.addAll(dresseur.getPaquetSecondaire());
+
 		List<Pokemon> pokemonsDisponibles = tousLesPokemons.stream()
 				.filter(p -> !pokemonsPossedes.contains(p))
-				.collect(Collectors.toList());  // On copie la liste dans une liste mutable
+				.collect(Collectors.toList());
 
 		if (pokemonsDisponibles.size() < 5) {
-			throw new RuntimeException("Pas assez de Pokémon disponibles pour le tirage !");
+			return false;
 		}
 
-		List<Pokemon> tirage = new ArrayList<>();
-		Collections.shuffle(pokemonsDisponibles, new Random());  // On peut maintenant mélanger la liste
-		for (int i = 0; i < 5; i++) {
-			tirage.add(pokemonsDisponibles.get(i));
+		Collections.shuffle(pokemonsDisponibles);
+		List<Pokemon> tirage = pokemonsDisponibles.subList(0, 5);
+
+		for (Pokemon p : tirage) {
+			if (dresseur.getPaquetPrincipal().size() < 5) {
+				dresseur.getPaquetPrincipal().add(p);
+			} else {
+				dresseur.getPaquetSecondaire().add(p);
+			}
 		}
 
-		dresseur.getPokemonList().addAll(tirage);
 		dresseur.getHistoriqueTirages().add(today);
 		repository.save(dresseur);
 
@@ -116,22 +123,33 @@ public class DresseurServiceImpl implements IDresseurService {
 			throw new RuntimeException("Un des dresseurs a déjà échangé aujourd'hui");
 		}
 
-		Pokemon pokemon1 = pokemonService.findById(request.getUuidPokemon1());
-		Pokemon pokemon2 = pokemonService.findById(request.getUuidPokemon2());
+		Pokemon pokemon1 = dresseur1.getPaquetPrincipal().stream()
+				.filter(p -> p.getUuid().equals(request.getUuidPokemon1()))
+				.findFirst()
+				.orElse(null);
 
-		if (!dresseur1.getPokemonList().contains(pokemon1) || !dresseur2.getPokemonList().contains(pokemon2)) {
-			throw new RuntimeException("Un des dresseurs ne possède pas le Pokémon à échanger");
+		Pokemon pokemon2 = dresseur2.getPaquetPrincipal().stream()
+				.filter(p -> p.getUuid().equals(request.getUuidPokemon2()))
+				.findFirst()
+				.orElse(null);
+
+		if (pokemon1 == null || pokemon2 == null) {
+			throw new RuntimeException("Un des Pokémon n'est pas dans le paquet principal !");
 		}
 
-		dresseur1.getPokemonList().remove(pokemon1);
-		dresseur2.getPokemonList().remove(pokemon2);
-		dresseur1.getPokemonList().add(pokemon2);
-		dresseur2.getPokemonList().add(pokemon1);
+		dresseur1.getPaquetPrincipal().remove(pokemon1);
+		dresseur2.getPaquetPrincipal().remove(pokemon2);
+
+		dresseur1.getPaquetPrincipal().add(pokemon2);
+		dresseur2.getPaquetPrincipal().add(pokemon1);
+
 		dresseur1.getHistoriqueEchanges().add(today);
 		dresseur2.getHistoriqueEchanges().add(today);
+
 		repository.save(dresseur1);
 		repository.save(dresseur2);
 
 		return true;
 	}
+
 }

@@ -18,6 +18,12 @@ public class Dresseur {
 
 	private String prenom;
 
+	@ManyToMany
+	private List<Pokemon> paquetPrincipal = new ArrayList<>();
+
+	@ManyToMany
+	private List<Pokemon> paquetSecondaire = new ArrayList<>();
+
 	private LocalDateTime deletedAt;
 
 	@ElementCollection
@@ -25,9 +31,6 @@ public class Dresseur {
 
 	@ElementCollection
 	private List<LocalDate> historiqueEchanges = new ArrayList<>();
-
-	@ManyToMany
-	private List<Pokemon> pokemonList = new ArrayList<>();
 
 	public String getUuid() {
 		return uuid;
@@ -53,14 +56,6 @@ public class Dresseur {
 		this.prenom = prenom;
 	}
 
-	public List<Pokemon> getPokemonList() {
-		return pokemonList;
-	}
-
-	public void setPokemonList(List<Pokemon> pokemonList) {
-		this.pokemonList = pokemonList;
-	}
-
 	public LocalDateTime getDeletedAt() {
 		return deletedAt;
 	}
@@ -81,5 +76,23 @@ public class Dresseur {
 		return historiqueEchanges;
 	}
 
-	public void setHistoriqueEchanges(List<LocalDate> historiqueEchanges) {}
+	public void setHistoriqueEchanges(List<LocalDate> historiqueEchanges) {
+		this.historiqueEchanges = historiqueEchanges;
+	}
+
+	public List<Pokemon> getPaquetPrincipal() {
+		return paquetPrincipal;
+	}
+
+	public List<Pokemon> getPaquetSecondaire() {
+		return paquetSecondaire;
+	}
+
+	public void setPaquetPrincipal(List<Pokemon> paquetPrincipal) {
+		this.paquetPrincipal = paquetPrincipal;
+	}
+
+	public void setPaquetSecondaire(List<Pokemon> paquetSecondaire) {
+		this.paquetSecondaire = paquetSecondaire;
+	}
 }

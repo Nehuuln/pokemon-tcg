@@ -55,16 +55,10 @@ public class DresseurController {
 	}
 
 	@PatchMapping("/{uuid}/tirer")
-	public ResponseEntity<?> tirer(@PathVariable String uuid) {
-		try {
-			System.out.println("Démarrage du tirage pour le dresseur: " + uuid);
-			dresseurService.tirerPokemon(uuid);
-			System.out.println("Tirage effectué avec succès pour le dresseur: " + uuid);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} catch (Exception e) {
-			System.out.println("Erreur dans le tirage: " + e.getMessage());
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	public ResponseEntity<String> tirer(@PathVariable String uuid) {
+		boolean success = dresseurService.tirerPokemon(uuid);
+		return success ? ResponseEntity.ok("Pokémon tiré avec succès !") :
+				ResponseEntity.badRequest().body("Échec du tirage.");
 	}
 
 	@PatchMapping("/{uuid}/echanger")

@@ -18,4 +18,6 @@ public interface IPokemonService {
 	boolean update(String uuid, Pokemon pokemon);
 
 	boolean delete(String uuid);
+
+	Pokemon tirerAleatoire();
 }

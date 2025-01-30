@@ -65,6 +65,11 @@ public class PokemonServiceImpl implements IPokemonService {
 		return true;
 	}
 
+	@Override
+	public Pokemon tirerAleatoire() {
+		return null;
+	}
+
 	private int genererRarete() {
 		int rand = random.nextInt(100);
 
