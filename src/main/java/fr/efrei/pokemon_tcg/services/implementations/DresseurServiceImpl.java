@@ -9,8 +9,13 @@ import fr.efrei.pokemon_tcg.services.IDresseurService;
 import fr.efrei.pokemon_tcg.services.IPokemonService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class DresseurServiceImpl implements IDresseurService {
@@ -58,6 +63,41 @@ public class DresseurServiceImpl implements IDresseurService {
 		Dresseur dresseur = findById(uuid);
 		dresseur.setDeletedAt(LocalDateTime.now());
 		repository.save(dresseur);
+		return true;
+	}
+
+	@Override
+	public boolean tirerPokemon(String uuid) {
+		Dresseur dresseur = findById(uuid);
+		if (dresseur == null) {
+			throw new RuntimeException("Dresseur introuvable !");
+		}
+
+		LocalDate today = LocalDate.now();
+		if (dresseur.getHistoriqueTirages().contains(today)) {
+			throw new RuntimeException("Le dresseur a déjà tiré aujourd'hui !");
+		}
+
+		List<Pokemon> tousLesPokemons = pokemonService.findAll(null);
+		List<Pokemon> pokemonsPossedes = dresseur.getPokemonList();
+		List<Pokemon> pokemonsDisponibles = tousLesPokemons.stream()
+				.filter(p -> !pokemonsPossedes.contains(p))
+				.collect(Collectors.toList());  // On copie la liste dans une liste mutable
+
+		if (pokemonsDisponibles.size() < 5) {
+			throw new RuntimeException("Pas assez de Pokémon disponibles pour le tirage !");
+		}
+
+		List<Pokemon> tirage = new ArrayList<>();
+		Collections.shuffle(pokemonsDisponibles, new Random());  // On peut maintenant mélanger la liste
+		for (int i = 0; i < 5; i++) {
+			tirage.add(pokemonsDisponibles.get(i));
+		}
+
+		dresseur.getPokemonList().addAll(tirage);
+		dresseur.getHistoriqueTirages().add(today);
+		repository.save(dresseur);
+
 		return true;
 	}
 }

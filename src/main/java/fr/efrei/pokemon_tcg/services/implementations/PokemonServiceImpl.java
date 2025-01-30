@@ -33,7 +33,7 @@ public class PokemonServiceImpl implements IPokemonService {
 		Pokemon pokemonACreer = new Pokemon();
 		pokemonACreer.setType(pokemon.getType());
 		pokemonACreer.setNom(pokemon.getNom());
-		pokemonACreer.setEtoile(genererRarete()); // Génération aléatoire des étoiles
+		pokemonACreer.setEtoile(genererRarete());
 		repository.save(pokemonACreer);
 	}
 
@@ -66,12 +66,12 @@ public class PokemonServiceImpl implements IPokemonService {
 	}
 
 	private int genererRarete() {
-		int rand = random.nextInt(100); // Génère un nombre entre 0 et 99
+		int rand = random.nextInt(100);
 
-		if (rand < 50) return 1; // 50% de chance d'avoir 1 étoile
-		if (rand < 75) return 2; // 25% de chance d'avoir 2 étoiles
-		if (rand < 90) return 3; // 15% de chance d'avoir 3 étoiles
-		if (rand < 98) return 4; // 8% de chance d'avoir 4 étoiles
-		return 5; // 2% de chance d'avoir 5 étoiles
+		if (rand < 50) return 1;
+		if (rand < 75) return 2;
+		if (rand < 90) return 3;
+		if (rand < 98) return 4;
+		return 5;
 	}
 }

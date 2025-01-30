@@ -3,6 +3,7 @@ package fr.efrei.pokemon_tcg.controllers;
 import fr.efrei.pokemon_tcg.dto.CapturePokemon;
 import fr.efrei.pokemon_tcg.dto.DresseurDTO;
 import fr.efrei.pokemon_tcg.models.Dresseur;
+import fr.efrei.pokemon_tcg.models.Pokemon;
 import fr.efrei.pokemon_tcg.services.IDresseurService;
 import fr.efrei.pokemon_tcg.services.implementations.DresseurServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -50,5 +51,18 @@ public class DresseurController {
 	@PatchMapping("/{uuid}/acheter")
 	public ResponseEntity<?> acheter() {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@PatchMapping("/{uuid}/tirer")
+	public ResponseEntity<?> tirer(@PathVariable String uuid) {
+		try {
+			System.out.println("Démarrage du tirage pour le dresseur: " + uuid);
+			dresseurService.tirerPokemon(uuid);
+			System.out.println("Tirage effectué avec succès pour le dresseur: " + uuid);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			System.out.println("Erreur dans le tirage: " + e.getMessage());
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 }
