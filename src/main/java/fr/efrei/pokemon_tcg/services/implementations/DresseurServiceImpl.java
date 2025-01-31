@@ -72,12 +72,12 @@ public class DresseurServiceImpl implements IDresseurService {
 	public boolean tirerPokemon(String uuid) {
 		Dresseur dresseur = findById(uuid);
 		if (dresseur == null) {
-			throw new RuntimeException("Dresseur introuvable !");
+			throw new RuntimeException("Dresseur introuvable");
 		}
 
 		LocalDate today = LocalDate.now();
 		if (dresseur.getHistoriqueTirages().contains(today)) {
-			throw new RuntimeException("Le dresseur a déjà tiré des Pokémon aujourd'hui !");
+			throw new RuntimeException("Le dresseur a déjà tiré des Pokémon aujourd'hui");
 		}
 
 		List<Pokemon> tousLesPokemons = pokemonService.findAll(null);
@@ -135,7 +135,7 @@ public class DresseurServiceImpl implements IDresseurService {
 				.orElse(null);
 
 		if (pokemon1 == null || pokemon2 == null) {
-			throw new RuntimeException("Un des Pokémon n'est pas dans le paquet secondaire !");
+			throw new RuntimeException("Un des Pokémon n'est pas dans le paquet secondaire");
 		}
 
 		dresseur1.getPaquetSecondaire().remove(pokemon1);
@@ -157,7 +157,7 @@ public class DresseurServiceImpl implements IDresseurService {
 	public boolean changerPokemonDeck(String uuid, EchangePokemonDeck request) {
 		Dresseur dresseur = findById(uuid);
 		if (dresseur == null) {
-			throw new RuntimeException("Dresseur introuvable !");
+			throw new RuntimeException("Dresseur introuvable");
 		}
 
 		Pokemon pokemonPrincipal = dresseur.getPaquetPrincipal().stream()
@@ -171,10 +171,9 @@ public class DresseurServiceImpl implements IDresseurService {
 				.orElse(null);
 
 		if (pokemonPrincipal == null || pokemonSecondaire == null) {
-			throw new RuntimeException("Un des Pokémon n'existe pas dans le bon deck !");
+			throw new RuntimeException("Un des Pokémon n'est pas dans le bon deck");
 		}
 
-		// Échanger les Pokémon
 		dresseur.getPaquetPrincipal().remove(pokemonPrincipal);
 		dresseur.getPaquetSecondaire().remove(pokemonSecondaire);
 
@@ -185,4 +184,41 @@ public class DresseurServiceImpl implements IDresseurService {
 		return true;
 	}
 
+	@Override
+	public boolean combattre(String uuidDresseur1, String uuidDresseur2) {
+		Dresseur dresseur1 = findById(uuidDresseur1);
+		Dresseur dresseur2 = findById(uuidDresseur2);
+
+		if (dresseur1 == null || dresseur2 == null) {
+			throw new RuntimeException("Un des dresseurs est introuvable !");
+		}
+
+		double puissanceDresseur1 = calculerPuissanceMoyenne(dresseur1.getPaquetPrincipal());
+		double puissanceDresseur2 = calculerPuissanceMoyenne(dresseur2.getPaquetPrincipal());
+
+		Dresseur gagnant = puissanceDresseur1 > puissanceDresseur2 ? dresseur1 : dresseur2;
+		Dresseur perdant = puissanceDresseur1 > puissanceDresseur2 ? dresseur2 : dresseur1;
+
+		Pokemon pokemonGagnant = obtenirPokemonLePlusFort(perdant.getPaquetPrincipal());
+
+		gagnant.getPaquetSecondaire().add(pokemonGagnant);
+
+		repository.save(gagnant);
+		repository.save(perdant);
+
+		return true;
+	}
+
+	private double calculerPuissanceMoyenne(List<Pokemon> paquet) {
+		return paquet.stream()
+				.mapToInt(Pokemon::getPuissance)
+				.average()
+				.orElse(0);
+	}
+
+	private Pokemon obtenirPokemonLePlusFort(List<Pokemon> paquet) {
+		return paquet.stream()
+				.max((p1, p2) -> Integer.compare(p1.getPuissance(), p2.getPuissance()))
+				.orElse(null);
+	}
 }
