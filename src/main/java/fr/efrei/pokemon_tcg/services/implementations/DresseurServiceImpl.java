@@ -123,25 +123,25 @@ public class DresseurServiceImpl implements IDresseurService {
 			throw new RuntimeException("Un des dresseurs a déjà échangé aujourd'hui");
 		}
 
-		Pokemon pokemon1 = dresseur1.getPaquetPrincipal().stream()
+		Pokemon pokemon1 = dresseur1.getPaquetSecondaire().stream()
 				.filter(p -> p.getUuid().equals(request.getUuidPokemon1()))
 				.findFirst()
 				.orElse(null);
 
-		Pokemon pokemon2 = dresseur2.getPaquetPrincipal().stream()
+		Pokemon pokemon2 = dresseur2.getPaquetSecondaire().stream()
 				.filter(p -> p.getUuid().equals(request.getUuidPokemon2()))
 				.findFirst()
 				.orElse(null);
 
 		if (pokemon1 == null || pokemon2 == null) {
-			throw new RuntimeException("Un des Pokémon n'est pas dans le paquet principal !");
+			throw new RuntimeException("Un des Pokémon n'est pas dans le paquet secondaire !");
 		}
 
-		dresseur1.getPaquetPrincipal().remove(pokemon1);
-		dresseur2.getPaquetPrincipal().remove(pokemon2);
+		dresseur1.getPaquetSecondaire().remove(pokemon1);
+		dresseur2.getPaquetSecondaire().remove(pokemon2);
 
-		dresseur1.getPaquetPrincipal().add(pokemon2);
-		dresseur2.getPaquetPrincipal().add(pokemon1);
+		dresseur1.getPaquetSecondaire().add(pokemon2);
+		dresseur2.getPaquetSecondaire().add(pokemon1);
 
 		dresseur1.getHistoriqueEchanges().add(today);
 		dresseur2.getHistoriqueEchanges().add(today);
