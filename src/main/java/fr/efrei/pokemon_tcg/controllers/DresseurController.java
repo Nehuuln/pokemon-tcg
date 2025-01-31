@@ -49,11 +49,6 @@ public class DresseurController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@PatchMapping("/{uuid}/acheter")
-	public ResponseEntity<?> acheter() {
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
 	@PatchMapping("/{uuid}/tirer")
 	public ResponseEntity<String> tirer(@PathVariable String uuid) {
 		boolean success = dresseurService.tirerPokemon(uuid);
