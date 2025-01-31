@@ -3,6 +3,7 @@ package fr.efrei.pokemon_tcg.controllers;
 import fr.efrei.pokemon_tcg.dto.CapturePokemon;
 import fr.efrei.pokemon_tcg.dto.DresseurDTO;
 import fr.efrei.pokemon_tcg.dto.EchangePokemon;
+import fr.efrei.pokemon_tcg.dto.EchangePokemonDeck;
 import fr.efrei.pokemon_tcg.models.Dresseur;
 import fr.efrei.pokemon_tcg.models.Pokemon;
 import fr.efrei.pokemon_tcg.services.IDresseurService;
@@ -68,4 +69,18 @@ public class DresseurController {
 		}
 		return ResponseEntity.badRequest().body("Échec de l'échange.");
 	}
+
+	@PatchMapping("/{uuid}/changer")
+	public ResponseEntity<String> changerPokemonDeck(
+			@PathVariable String uuid,
+			@RequestBody EchangePokemonDeck request) {
+
+		boolean success = dresseurService.changerPokemonDeck(uuid, request);
+
+		if (success) {
+			return ResponseEntity.ok("Échange entre decks effectué avec succès !");
+		}
+		return ResponseEntity.badRequest().body("Échec de l'échange.");
+	}
+
 }

@@ -3,6 +3,7 @@ package fr.efrei.pokemon_tcg.services.implementations;
 import fr.efrei.pokemon_tcg.dto.CapturePokemon;
 import fr.efrei.pokemon_tcg.dto.DresseurDTO;
 import fr.efrei.pokemon_tcg.dto.EchangePokemon;
+import fr.efrei.pokemon_tcg.dto.EchangePokemonDeck;
 import fr.efrei.pokemon_tcg.models.Dresseur;
 import fr.efrei.pokemon_tcg.models.Pokemon;
 import fr.efrei.pokemon_tcg.repositories.DresseurRepository;
@@ -149,6 +150,38 @@ public class DresseurServiceImpl implements IDresseurService {
 		repository.save(dresseur1);
 		repository.save(dresseur2);
 
+		return true;
+	}
+
+	@Override
+	public boolean changerPokemonDeck(String uuid, EchangePokemonDeck request) {
+		Dresseur dresseur = findById(uuid);
+		if (dresseur == null) {
+			throw new RuntimeException("Dresseur introuvable !");
+		}
+
+		Pokemon pokemonPrincipal = dresseur.getPaquetPrincipal().stream()
+				.filter(p -> p.getUuid().equals(request.getUuidPokemonPrincipal()))
+				.findFirst()
+				.orElse(null);
+
+		Pokemon pokemonSecondaire = dresseur.getPaquetSecondaire().stream()
+				.filter(p -> p.getUuid().equals(request.getUuidPokemonSecondaire()))
+				.findFirst()
+				.orElse(null);
+
+		if (pokemonPrincipal == null || pokemonSecondaire == null) {
+			throw new RuntimeException("Un des Pokémon n'existe pas dans le bon deck !");
+		}
+
+		// Échanger les Pokémon
+		dresseur.getPaquetPrincipal().remove(pokemonPrincipal);
+		dresseur.getPaquetSecondaire().remove(pokemonSecondaire);
+
+		dresseur.getPaquetPrincipal().add(pokemonSecondaire);
+		dresseur.getPaquetSecondaire().add(pokemonPrincipal);
+
+		repository.save(dresseur);
 		return true;
 	}
 
